@@ -3,7 +3,7 @@ import './App.css';
 import axios from 'axios';
 
 function GameScreen(props) {
-    const [gameTime, setGameTime] = useState(10)
+    const [gameTime, setGameTime] = useState(100)
     const [gameScore, setGameScore] = useState(0)
     const [prompt, setPrompt] = useState('')
     const [answer, setAnswer] = useState('')
@@ -34,7 +34,7 @@ function GameScreen(props) {
 
     const resetGame = () => {
         setIsGameOver(false)
-        setGameTime(10)
+        setGameTime(100)
         setGameScore(gameScore => (0))
         setInputError(false)
         setInputErrorMessage('')
@@ -193,12 +193,12 @@ function GameScreen(props) {
         }
     }
 
-    function ShowEnterScoreModal({bool, score}) {
+    function ShowEnterScoreModal({bool}) {
         if (bool == true) {
             return (
                 <>
                     <div className='enterScoreModal'>
-                        <text style={{fontSize: '3em'}}>You scored {score}</text>
+                        <text style={{fontSize: '3em'}}>You scored {gameScore}</text>
                         <text style={{fontSize: '3em'}}>Enter a name to save your score</text>
                         <input onChange={(e) => setUsername(e.target.value)} className='nameInput' value={username}></input>
                         <text onClick={() => saveAndSubmit()} style={{fontSize: '2em', textDecoration: 'underline'}} >Save</text>
@@ -232,7 +232,7 @@ function GameScreen(props) {
                     <span style={{fontSize: '6em'}}>]</span>
                 </div>
                 <ShowInputError bool={inputError} errorMessage={inputErrorMessage}/>
-                {ShowEnterScoreModal ({bool: showScoreModal}, {score: gameScore})}
+                {ShowEnterScoreModal ({bool: showScoreModal})}
             </div>
         </div>
     </div>
