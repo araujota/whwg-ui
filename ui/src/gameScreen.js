@@ -161,7 +161,7 @@ function GameScreen(props) {
             username: username,
             score: gameScore
         }
-        axios.post('http://localhost:8080/score', payload).then((response) => {
+        axios.post('http://44.223.184.1:8080/score', payload).then((response) => {
             if (response.status == 200) {
                 props.setShowing('scoreboard')
             }

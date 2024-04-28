@@ -6,7 +6,7 @@ function Scoreboard(props) {
     const [scoreData, setScoreData] = useState([])
 
     const getScores = () => {
-        axios.get('http://localhost:8080/scores').then((response) => {
+        axios.get('http://44.223.184.1:8080/scores').then((response) => {
             setScoreData(response.data)
         })
     }
