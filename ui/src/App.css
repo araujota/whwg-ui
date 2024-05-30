@@ -1,143 +1,240 @@
+/* Importing the Roboto font */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap');
+
+:root {
+  --primary-color: #ffc444;
+  --secondary-color: #fff;
+  --text-color: #333;
+  --error-color: #e74c3c;
+  --border-radius: 10px;
+  --spacing-unit: 10px;
+  --font-size-large: 2rem;
+  --font-size-medium: 1.5rem;
+  --font-size-small: 1rem;
+}
+
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
 }
 
 .container {
   height: 100vh;
   width: 100%;
-  background-color: #ffc444;
-  text-align: center;
+  background-color: var(--primary-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
+  padding: var(--spacing-unit);
+  text-align: center;
 }
 
 .topper {
-  font-size: x-large;
-  font-weight: 800;
+  font-size: var(--font-size-large);
+  font-weight: 900;
+  margin-bottom: var(--spacing-unit);
 }
 
 .rulesBlock {
   width: auto;
-  height: auto;
-  margin: 10;
-  margin-top: 10vh;
   text-align: center;
-  flex: auto;
-  justify-content: space-around;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-unit);
+  margin-top: 5vh; /* Adjusted to ensure visibility */
 }
 
 .rulesText {
-  font-size: larger;
+  font-size: var(--font-size-medium);
+  margin-bottom: var(--spacing-unit);
 }
 
 .startButton {
-  width: 120;
-  height: 60;
-  background-color: #ffc444;
-  font-size: x-large;
+  width: 100px;
+  height: 50px;
+  background-color: var(--primary-color);
+  font-size: var(--font-size-small);
+  font-weight: 700;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  justify-self: center;
+}
+
+.startButton:hover {
+  background-color: darken(var(--primary-color), 10%);
 }
 
 .gameBox {
   width: 100%;
-  height: auto;
-  display: inline-flex;
+  display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  align-items: center;
 }
 
-.featureBox {
-  width: 30vw;
-  height: 50vh;
-  margin-top: 10vh;
-  display: inline-flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
+.featureBox,
 .featureBoxPrompt {
-  width: 30vw;
-  height: 50vh;
-  margin-top: 10vh;
-  display: inline-flex;
+  width: 90vw;
+  height: 30vh;
+  margin-top: 5vh;
+  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background-color: var(--primary-color);
+  border-radius: var(--border-radius);
 }
 
 .timeScoreText {
-  font-size: 6em;
+  font-size: var(--font-size-medium);
   margin-bottom: 5%;
 }
 
 .timeText {
-  font-size: 8em;
+  font-size: var(--font-size-large);
 }
 
 .attributesContainer {
   width: 100%;
-  height: 100%;
-  display: inline-flex;
-  flex-direction: row;
+  display: flex;
   justify-content: space-around;
 }
 
 .promptText {
-  font-size: 12em;
+  font-size: var(--font-size-medium);
+  text-align: center;
 }
 
 .inputContainer {
-  margin-bottom: 20vh;
-  display: inline-flex;
+  margin-top: 5vh;
+  margin-bottom: 5vh;
+  display: flex;
   flex-direction: column;
-  align-content: center;
+  align-items: center;
+  gap: var(--spacing-unit);
 }
 
 .answerInput {
-  width: 50vh;
-  height: 8%;
+  width: 90vw;
+  height: 50px;
   text-align: center;
-  font-size: 4em;
-  margin: 5px;
+  font-size: var(--font-size-small);
   outline: none;
-  border-radius: 5px;
-  border: none;
-  background-color: #ffc444;
+  border-radius: var(--border-radius);
+  background-color: var(--primary-color);
+  padding: var(--spacing-unit);
 }
 
 .nameInput {
-  width: 50%;
-  height: 8%;
+  width: 90vw;
+  height: 50px;
   text-align: center;
-  font-size: 2em;
+  font-size: var(--font-size-small);
   outline: none;
-  border-radius: 5px;
-  border: 1;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--text-color);
+  padding: var(--spacing-unit);
 }
 
 .inputError {
-  width: auto;
-  height: auto;
-  color: red;
+  color: var(--error-color);
+  margin-top: var(--spacing-unit);
 }
 
 .playOrSave {
-  width: auto;
-  height: auto;
-  color: black;
+  color: var(--text-color);
+  margin-top: var(--spacing-unit);
 }
 
 .enterScoreModal {
-  position: absolute;
-  top: 20%;
-  right: 20%;
-  height: 70%;
-  width: 60%;
-  border: 3px solid black;
-  border-radius: 20px;
-  background-color: #ffc444;
-  display: inline-flex;
+  position: fixed;
+  top: 10%;
+  left: 10%;
+  height: 80%;
+  width: 80%;
+  border: 3px solid var(--text-color);
+  border-radius: var(--border-radius);
+  background-color: var(--primary-color);
+  display: flex;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
+  padding: var(--spacing-unit);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
 
+/* Media Queries */
+@media (min-width: 600px) {
+  .featureBox,
+  .featureBoxPrompt {
+    width: 60vw;
+  }
+
+  .answerInput,
+  .nameInput {
+    width: 70vw;
+  }
+
+  .topper {
+    font-size: 1.5rem;
+  }
+
+  .rulesText {
+    font-size: 1.5rem;
+  }
+
+  .timeScoreText {
+    font-size: 2.5rem;
+  }
+
+  .timeText, .inputErrorText {
+    font-size: 3rem;
+  }
+
+  .promptText {
+    font-size: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .featureBox,
+  .featureBoxPrompt {
+    width: 40vw;
+  }
+
+  .answerInput,
+  .nameInput {
+    width: 50vw;
+  }
+
+  .topper {
+    font-size: 2rem;
+  }
+
+  .rulesText {
+    font-size: 1rem;
+  }
+
+  .timeScoreText {
+    font-size: 3rem;
+  }
+
+  .timeText, .inputErrorText {
+    font-size: 4rem;
+  }
+
+  .promptText {
+    font-size: 3rem;
+  }
 }

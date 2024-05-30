@@ -19,13 +19,13 @@ function Scoreboard(props) {
     <div className="container">
       <span className='topper'>WHWG</span>
         <div style={{paddingTop: '3%', paddingBottom: '2%'}}>
-          <text style={{fontSize: '2em'}} >Scoreboard</text>
+          <text className='timeText' >Scoreboard</text>
         </div>
-        <div style={{paddingBottom: '1%'}}>
-          <text style={{fontSize: '2em', paddingRight: '5%'}} >Name</text>
-          <text style={{fontSize: '2em', paddingLeft: '5%'}} >Score</text>
+        <div style={{paddingBottom: '1%', display: 'flex', justifyContent: 'space-around', width: '60vw'}}>
+          <text className='timeText' >Name</text>
+          <text className='timeText' >Score</text>
         </div>
-        <div style={{ height: '60%', width: '30%', overflowY: 'scroll', display: 'inline-flex', flexDirection: 'column', marginBottom: '30px'}}>
+        <div style={{ height: '60%', width: '60vw', overflowY: 'scroll', display: 'inline-flex', flexDirection: 'column', marginBottom: '30px'}}>
             {scoreData?.map((score) => (
                 <div key={score.id} style={{display: 'inline-flex', justifyContent: 'space-between'}}>
                     <text>{score?.username}</text>
@@ -33,7 +33,9 @@ function Scoreboard(props) {
                 </div>
             ))}
         </div>
-        <text style={{position: 'absolute', bottom: 0, right: '30%'}}>Support the creator! Email me at araujota97@gmail.com or venmo me @Tyler-Araujo</text>
+        <button className='startButton' onClick={() => props.setShowing('game')}>Play</button>
+        <button className='startButton' onClick={() => props.setShowing('rules')}>Rules</button>
+        <text style={{justifySelf: 'center'}}>Support the creator! Email me at araujota97@gmail.com or venmo me @Tyler-Araujo</text>
     </div>
   );
 }

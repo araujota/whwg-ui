@@ -1,242 +1,226 @@
-import { useEffect, useRef, useState  } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './App.css';
 import axios from 'axios';
 
 function GameScreen(props) {
-    const [gameTime, setGameTime] = useState(100)
-    const [gameScore, setGameScore] = useState(0)
-    const [prompt, setPrompt] = useState('')
-    const [answer, setAnswer] = useState('')
-    const [inputError, setInputError] = useState(false)
-    const [inputErrorMessage, setInputErrorMessage] = useState('')
-    const [promptPool, setPromptPool] = useState([])
-    const [validateUrl, setValidateUrl] = useState('')
-    const [isGameOver, setIsGameOver] = useState(false)
-    const [showScoreModal, setShowScoreModal] = useState(false)
-    const [username, setUsername] = useState('')
+    const [gameTime, setGameTime] = useState(20);
+    const [gameScore, setGameScore] = useState(0);
+    const [prompt, setPrompt] = useState('');
+    const [answer, setAnswer] = useState('');
+    const [inputError, setInputError] = useState(false);
+    const [inputErrorMessage, setInputErrorMessage] = useState('');
+    const [promptPool, setPromptPool] = useState([]);
+    const [validateUrl, setValidateUrl] = useState('');
+    const [isGameOver, setIsGameOver] = useState(false);
+    const [showScoreModal, setShowScoreModal] = useState(false);
+    const [username, setUsername] = useState('');
+    const [usernameError, setUsernameError] = useState('');
 
-    const answerr = useRef(answer)
-    const promptt = useRef(prompt)
-    const promptPoool = useRef(promptPool)
+    const answerr = useRef(answer);
+    const promptt = useRef(prompt);
+    const promptPoool = useRef(promptPool);
 
-    
     const loadPrompt = () => {
-        let index = Math.floor(Math.random()*500)
-        let indexWord = promptPoool.current[index].word
-        if (!indexWord.includes('-') || !indexWord.includes(' ')) {
-            let sliceStart = Math.floor(Math.random() * 3) + 1
-            let thisPrompt = indexWord.substring(sliceStart, sliceStart+3)
-            setPrompt(thisPrompt)
-        } else {
-            loadPrompt()
+        const isAlpha = (str) => /^[A-Za-z]+$/.test(str);
+
+        let newPrompt = "";
+        while (!isAlpha(newPrompt)) {
+            let index = Math.floor(Math.random() * 500);
+            let indexWord = promptPoool.current[index].word;
+            if (isAlpha(indexWord)) {
+                let sliceStart = Math.floor(Math.random() * 3) + 1;
+                newPrompt = indexWord.substring(sliceStart, sliceStart + 3);
+            }
         }
-    }
+        setPrompt(newPrompt);
+    };
 
     const resetGame = () => {
-        setIsGameOver(false)
-        setGameTime(100)
-        setGameScore(gameScore => (0))
-        setInputError(false)
-        setInputErrorMessage('')
-        loadPrompt()
-    }
+        setIsGameOver(false);
+        setGameTime(20);
+        setGameScore(0);
+        setInputError(false);
+        setInputErrorMessage('');
+        loadPrompt();
+    };
 
     const answerSuccess = () => {
-        setGameScore((gameScore) => (gameScore+1))
-        setInputError(false)
-        setInputErrorMessage('')
-        setAnswer('')
-        loadPrompt()
-    }
+        setGameScore((prevScore) => prevScore + 1);
+        setInputError(false);
+        setInputErrorMessage('');
+        setAnswer('');
+        setGameTime(20);
+        loadPrompt();
+    };
 
-    async function getPromptPool() {
-        await (fetch("https://api.datamuse.com/words?sp=???????&max=500"))
-        .then(response => {return response.json()}
-        ).then(response => {
-            setPromptPool(response)
-        })
-    }
+    const getPromptPool = async () => {
+        try {
+            const response = await fetch("https://api.datamuse.com/words?sp=???????&max=500");
+            const data = await response.json();
+            setPromptPool(data);
+        } catch (error) {
+            console.error('Error fetching prompt pool:', error);
+        }
+    };
 
     const setVals = (e) => {
-        setAnswer(e)
-        setValidateUrl('https://api.dictionaryapi.dev/api/v2/entries/en/'+e)
-    }
+        setAnswer(e.target.value);
+        setValidateUrl(`https://api.dictionaryapi.dev/api/v2/entries/en/${e.target.value}`);
+    };
 
     const gameOver = () => {
-        setIsGameOver(true)
-        setInputError(true)
-        setInputErrorMessage("Game Over!")
-    }
+        setIsGameOver(true);
+        setInputError(true);
+        setInputErrorMessage("Game Over!");
+    };
 
     const decrement = () => {
-        let newTime = gameTime-1
-        setGameTime(newTime)
-    }
+        setGameTime((prevTime) => prevTime - 1);
+    };
 
     useEffect(() => {
-        if (gameTime > 0) {
-            setTimeout(decrement, 1000)
-        } else {
-            gameOver()
+        if (gameTime > 0 && !isGameOver) {
+            const timerId = setTimeout(decrement, 1000);
+            return () => clearTimeout(timerId);
+        } else if (gameTime === 0) {
+            gameOver();
         }
-    }, [gameTime])
+    }, [gameTime, isGameOver]);
 
     useEffect(() => {
-        console.log(username)
-    }, [username])
+        answerr.current = answer;
+    }, [answer]);
 
     useEffect(() => {
-        answerr.current = answer
-    }, [answer])
+        promptt.current = prompt;
+    }, [prompt]);
 
     useEffect(() => {
-        promptt.current = prompt
-    }, [prompt])
+        promptPoool.current = promptPool;
+    }, [promptPool]);
 
     useEffect(() => {
-        promptPoool.current = promptPool
-    }, [promptPool])
+        getPromptPool();
+    }, []);
 
     useEffect(() => {
-        getPromptPool()
-    }, [])
-
-    useEffect(() => {
-        if(promptPool.length > 0) {
-            loadPrompt()
+        if (promptPool.length > 0) {
+            loadPrompt();
         }
-    }, [promptPool])
+    }, [promptPool]);
 
-    const handleValidate = () => {
-        validate()
-    }
-
-    const handleKeyDown = (e) => {
-            if(e.keyCode === 13) {
-                handleValidate()
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.keyCode === 13) {
+                validate();
             }
-      }
-
-    useEffect(() => {
+        };
         document.addEventListener('keydown', handleKeyDown);
-      }, []);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
-    async function validate() {
-        let start = answerr.current.slice(0,3)
-        let end = answerr.current.slice(answerr.current.length-3, answerr.current.length)
-        console.log(promptt.current)
-        console.log(answerr.current)
+    const validate = async () => {
+        const start = answerr.current.slice(0, 3);
+        const end = answerr.current.slice(-3);
 
-        await (fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+answerr.current)
-            .then(response => {
-                return response;
-            })
-            .then(response => {
-                if ((response.status == 200) && (start !== promptt.current) && (end !== promptt.current) && answerr.current.includes(promptt.current)) {
-                    answerSuccess()
-                } else {
-                    if(response.status == 404) {
-                        setInputErrorMessage('Not a Word!')
-                        setInputError(true)
-                        setAnswer('')
-                    } else if (start === promptt.current) {
-                        setInputErrorMessage('Answer cannot start with the prompt!')
-                        setInputError(true)
-                        setAnswer('')
-                    } else if (end === promptt.current) {
-                        setInputErrorMessage('Answer cannot end with the prompt!')
-                        setInputError(true)
-                        setAnswer('')
-                    } else if (!answerr.current.includes(promptt.current)){
-                        setInputErrorMessage('Answer must contain the prompt!')
-                        setInputError(true)
-                        setAnswer('')
-                    }
-                }
-            }))
-    }
+        try {
+            const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${answerr.current}`);
+            if (response.status === 200 && start !== promptt.current && end !== promptt.current && answerr.current.includes(promptt.current)) {
+                answerSuccess();
+            } else {
+                handleValidationError(response.status, start, end);
+            }
+        } catch (error) {
+            console.error('Error validating answer:', error);
+        }
+    };
+
+    const handleValidationError = (status, start, end) => {
+        if (status === 404) {
+            setInputErrorMessage('Not a Word!');
+        } else if (start === promptt.current) {
+            setInputErrorMessage('Answer cannot start with the prompt!');
+        } else if (end === promptt.current) {
+            setInputErrorMessage('Answer cannot end with the prompt!');
+        } else if (!answerr.current.includes(promptt.current)) {
+            setInputErrorMessage('Answer must contain the prompt!');
+        }
+        setInputError(true);
+        setAnswer('');
+    };
 
     const saveAndSubmit = () => {
+        if (username.trim() === '') {
+            setUsernameError('Username cannot be empty');
+            return;
+        }
+
         const payload = {
-            username: username,
+            username,
             score: gameScore
-        }
-        axios.post('http://44.223.184.1:8080/score', payload).then((response) => {
-            if (response.status == 200) {
-                props.setShowing('scoreboard')
-            }
-        })
-    }
+        };
+        axios.post('http://44.223.184.1:8080/score', payload)
+            .then((response) => {
+                if (response.status === 200) {
+                    props.setShowing('scoreboard');
+                }
+            });
+    };
 
-    function ShowInputError({bool, errorMessage}) {
-        if (bool == true) {
-            if (errorMessage == 'Game Over!') {
-                return (
-                    <>
-                        <div className='inputError'>
-                            <text style={{fontSize: '2em'}}>{errorMessage}</text>
-                        </div>
-                        <div className='playOrSave'>
-                            <text onClick={() => resetGame()} style={{fontSize: '2em', textDecoration: 'underline'}}>Play Again</text>
-                            <text style={{fontSize: '2em'}}> or </text>
-                            <text onClick={() => setShowScoreModal(true)} style={{fontSize: '2em', textDecoration: 'underline'}} >Save</text>
-                        </div>
-                    </>
-                )
-            } else {
-                return (
-                    <div className='inputError'>
-                        <text style={{fontSize: '2em'}}>{errorMessage}</text>
+    return (
+        <div className="container">
+            <span className='topper'>WHWG</span>
+            <div className='gameBox'>
+                <div className='attributesContainer'>
+                    <div className='featureBox'>
+                        <span className='timeScoreText'>TIME</span>
+                        <span className='timeText'>{gameTime}</span>
                     </div>
-                )
-            }
-        }
-    }
-
-    function ShowEnterScoreModal({bool}) {
-        if (bool == true) {
-            return (
-                <>
-                    <div className='enterScoreModal'>
-                        <text style={{fontSize: '3em'}}>You scored {gameScore}</text>
-                        <text style={{fontSize: '3em'}}>Enter a name to save your score</text>
-                        <input onChange={(e) => setUsername(e.target.value)} className='nameInput' value={username}></input>
-                        <text onClick={() => saveAndSubmit()} style={{fontSize: '2em', textDecoration: 'underline'}} >Save</text>
+                    <div className='featureBoxPrompt'>
+                        <span className='promptText'>[{prompt}]</span>
                     </div>
-                </>
-            )
-        }
-    }
-
-  return (
-    <div className="container">
-      <span className='topper'>WHWG</span>
-        <div className='gameBox'>
-            <div className='attributesContainer'>
-                <div className='featureBox'>
-                    <text className='timeScoreText'>TIME</text>
-                    <text className='timeText'>{gameTime}</text>
+                    <div className='featureBox'>
+                        <span className='timeScoreText'>SCORE</span>
+                        <span className='timeText'>{gameScore}</span>
+                    </div>
                 </div>
-                <div className='featureBoxPrompt'>
-                    <text className='promptText'>[{prompt}]</text>
+                <div className='inputContainer'>
+                    <input disabled={isGameOver} className='answerInput' onChange={setVals} value={answer} />
+                    {inputError && (
+                        <>
+                            <div className='inputError'>
+                                <span className='inputErrorText'>{inputErrorMessage}</span>
+                            </div>
+                            {inputErrorMessage === 'Game Over!' && (
+                                <div className='playOrSave'>
+                                    <span onClick={resetGame} style={{ fontSize: '2em', textDecoration: 'underline' }}>Play Again</span>
+                                    <span style={{ fontSize: '2em' }}> or </span>
+                                    <span onClick={() => setShowScoreModal(true)} style={{ fontSize: '2em', textDecoration: 'underline' }}>Save</span>
+                                </div>
+                            )}
+                        </>
+                    )}
+                    {showScoreModal && (
+                        <div className='enterScoreModal'>
+                            <span className='timeText'>You scored {gameScore}</span>
+                            <span className='timeText'>Enter a name to save your score</span>
+                            <input
+                                onChange={(e) => {
+                                    setUsername(e.target.value);
+                                    setUsernameError('');
+                                }}
+                                className='nameInput'
+                                value={username}
+                            />
+                            {usernameError && <div className='inputError'>{usernameError}</div>}
+                            <span onClick={saveAndSubmit} style={{ fontSize: '2em', textDecoration: 'underline' }}>Save</span>
+                        </div>
+                    )}
                 </div>
-                <div className='featureBox'>
-                    <text className='timeScoreText'>SCORE</text>
-                    <text className='timeText'>{gameScore}</text>
-                </div>
-            </div>
-            <div className='inputContainer'>
-                <div>
-                    <span style={{fontSize: '6em'}}>[</span>
-                    <input disabled={isGameOver} className='answerInput' onChange={e => setVals(e.target.value)} value={answer}></input>
-                    <span style={{fontSize: '6em'}}>]</span>
-                </div>
-                <ShowInputError bool={inputError} errorMessage={inputErrorMessage}/>
-                {ShowEnterScoreModal ({bool: showScoreModal})}
             </div>
         </div>
-    </div>
-  );
+    );
 }
 
 export default GameScreen;
+
