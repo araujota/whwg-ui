@@ -15,6 +15,8 @@ function GameScreen(props) {
     const [showScoreModal, setShowScoreModal] = useState(false);
     const [username, setUsername] = useState('');
     const [usernameError, setUsernameError] = useState('');
+    const [couldAnswer, setCouldAnswer] = useState('')
+    const [couldAnswerDef, setCouldAnswerDef] = useState('')
 
     const answerr = useRef(answer);
     const promptt = useRef(prompt);
@@ -30,6 +32,8 @@ function GameScreen(props) {
             if (isAlpha(indexWord)) {
                 let sliceStart = Math.floor(Math.random() * 3) + 1;
                 newPrompt = indexWord.substring(sliceStart, sliceStart + 3);
+                setCouldAnswer(indexWord);
+                getDef(indexWord);
             }
         }
         setPrompt(newPrompt);
@@ -55,7 +59,7 @@ function GameScreen(props) {
 
     const getPromptPool = async () => {
         try {
-            const response = await fetch("https://api.datamuse.com/words?sp=???????&max=500");
+            const response = await fetch("https://api.datamuse.com/words?sp=????????&max=500");
             const data = await response.json();
             setPromptPool(data);
         } catch (error) {
@@ -66,6 +70,16 @@ function GameScreen(props) {
     const setVals = (e) => {
         setAnswer(e.target.value);
         setValidateUrl(`https://api.dictionaryapi.dev/api/v2/entries/en/${e.target.value}`);
+    };
+
+    const getDef = async (word) => {
+            const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+            if (response.status === 200) {
+                const data = await response.json()
+                setCouldAnswerDef(data[0].meanings[0].definitions[0].definition);
+            } else {
+                console.error('Error getting definition');
+            }
     };
 
     const gameOver = () => {
@@ -193,9 +207,9 @@ function GameScreen(props) {
                             </div>
                             {inputErrorMessage === 'Game Over!' && (
                                 <div className='playOrSave'>
-                                    <span onClick={resetGame} style={{ fontSize: '2em', textDecoration: 'underline' }}>Play Again</span>
+                                    <span onClick={resetGame} className='timeText'>Play Again</span>
                                     <span style={{ fontSize: '2em' }}> or </span>
-                                    <span onClick={() => setShowScoreModal(true)} style={{ fontSize: '2em', textDecoration: 'underline' }}>Save</span>
+                                    <span onClick={() => setShowScoreModal(true)}className='timeText'>Save</span>
                                 </div>
                             )}
                         </>
@@ -203,6 +217,8 @@ function GameScreen(props) {
                     {showScoreModal && (
                         <div className='enterScoreModal'>
                             <span className='timeText'>You scored {gameScore}</span>
+                            <span className='timeText'>You could have answered "{couldAnswer}"</span>
+                            <span className='timeTextItalic'>"{couldAnswerDef}"</span>
                             <span className='timeText'>Enter a name to save your score</span>
                             <input
                                 onChange={(e) => {

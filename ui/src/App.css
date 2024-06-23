@@ -105,6 +105,11 @@ body {
   font-size: var(--font-size-large);
 }
 
+.timeTextItalic {
+  font-size: var(--font-size-large);
+  font-style: italic;
+}
+
 .attributesContainer {
   width: 100%;
   display: flex;
@@ -183,7 +188,7 @@ body {
 
   .answerInput,
   .nameInput {
-    width: 70vw;
+    width: 50%;
   }
 
   .topper {
@@ -191,7 +196,7 @@ body {
   }
 
   .rulesText {
-    font-size: 1.5rem;
+    font-size: 0.8rem;
   }
 
   .timeScoreText {
@@ -215,7 +220,7 @@ body {
 
   .answerInput,
   .nameInput {
-    width: 50vw;
+    width: 30%;
   }
 
   .topper {
