@@ -1,9 +1,9 @@
 {
-  "short_name": "WHWG",
+  "short_name": "Speedle",
   "name": "The World's Hardest Word Game",
   "icons": [
     {
-      "src": "whwglogo.png",
+      "src": "speedlelogo.png",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     }

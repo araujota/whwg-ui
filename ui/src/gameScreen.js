@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import './App.css';
 import axios from 'axios';
+import ClipLoader from 'react-spinners/CircleLoader';
+import Chime_01 from './assets/Chime_01.mp3'
 
 function GameScreen(props) {
     const [gameTime, setGameTime] = useState(20);
+    const [loadingValidation, setLoadingValidaton] = useState(false);
     const [gameScore, setGameScore] = useState(0);
     const [prompt, setPrompt] = useState('');
     const [answer, setAnswer] = useState('');
@@ -17,6 +20,7 @@ function GameScreen(props) {
     const [usernameError, setUsernameError] = useState('');
     const [couldAnswer, setCouldAnswer] = useState('')
     const [couldAnswerDef, setCouldAnswerDef] = useState('')
+    const [saveLoading, setSaveLoading] = useState(false);
 
     const answerr = useRef(answer);
     const promptt = useRef(prompt);
@@ -40,21 +44,27 @@ function GameScreen(props) {
     };
 
     const resetGame = () => {
-        setIsGameOver(false);
         setGameTime(20);
         setGameScore(0);
         setInputError(false);
         setInputErrorMessage('');
         loadPrompt();
+        setIsGameOver(false);
     };
+
+    const playAudio = () => {
+        new Audio(Chime_01).play()
+      };
 
     const answerSuccess = () => {
         setGameScore((prevScore) => prevScore + 1);
-        setInputError(false);
-        setInputErrorMessage('');
+        setInputError(true);
+        setInputErrorMessage('+1');
+        setTimeout(clearInputMsg, 1500)
         setAnswer('');
         setGameTime(20);
         loadPrompt();
+        setLoadingValidaton(false);
     };
 
     const getPromptPool = async () => {
@@ -68,7 +78,7 @@ function GameScreen(props) {
     };
 
     const setVals = (e) => {
-        setAnswer(e.target.value);
+        setAnswer(e.target.value.toLowerCase());
         setValidateUrl(`https://api.dictionaryapi.dev/api/v2/entries/en/${e.target.value}`);
     };
 
@@ -79,6 +89,7 @@ function GameScreen(props) {
                 setCouldAnswerDef(data[0].meanings[0].definitions[0].definition);
             } else {
                 console.error('Error getting definition');
+                setCouldAnswerDef('--')
             }
     };
 
@@ -90,6 +101,13 @@ function GameScreen(props) {
 
     const decrement = () => {
         setGameTime((prevTime) => prevTime - 1);
+    };
+
+    const clearInputMsg = () => {
+        if (inputErrorMessage !== "Game Over") {
+            setInputErrorMessage('')
+            setInputError(false)
+        }
     };
 
     useEffect(() => {
@@ -134,12 +152,14 @@ function GameScreen(props) {
     }, []);
 
     const validate = async () => {
+        setLoadingValidaton(true)
         const start = answerr.current.slice(0, 3);
         const end = answerr.current.slice(-3);
 
         try {
             const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${answerr.current}`);
             if (response.status === 200 && start !== promptt.current && end !== promptt.current && answerr.current.includes(promptt.current)) {
+                playAudio()
                 answerSuccess();
             } else {
                 handleValidationError(response.status, start, end);
@@ -152,12 +172,20 @@ function GameScreen(props) {
     const handleValidationError = (status, start, end) => {
         if (status === 404) {
             setInputErrorMessage('Not a Word!');
+            setLoadingValidaton(false);
+            setTimeout(clearInputMsg, 1500)
         } else if (start === promptt.current) {
             setInputErrorMessage('Answer cannot start with the prompt!');
+            setLoadingValidaton(false);
+            setTimeout(clearInputMsg, 1500)
         } else if (end === promptt.current) {
             setInputErrorMessage('Answer cannot end with the prompt!');
+            setLoadingValidaton(false);
+            setTimeout(clearInputMsg, 1500)
         } else if (!answerr.current.includes(promptt.current)) {
             setInputErrorMessage('Answer must contain the prompt!');
+            setLoadingValidaton(false);
+            setTimeout(clearInputMsg, 1500)
         }
         setInputError(true);
         setAnswer('');
@@ -169,6 +197,8 @@ function GameScreen(props) {
             return;
         }
 
+        setSaveLoading(true);
+
         const payload = {
             username,
             score: gameScore
@@ -176,6 +206,7 @@ function GameScreen(props) {
         axios.post('http://44.223.184.1:8080/score', payload)
             .then((response) => {
                 if (response.status === 200) {
+                    setSaveLoading(false);
                     props.setShowing('scoreboard');
                 }
             });
@@ -183,42 +214,53 @@ function GameScreen(props) {
 
     return (
         <div className="container">
-            <span className='topper'>WHWG</span>
             <div className='gameBox'>
+            <span className='topper'>Speedle</span>
                 <div className='attributesContainer'>
-                    <div className='featureBox'>
-                        <span className='timeScoreText'>TIME</span>
-                        <span className='timeText'>{gameTime}</span>
-                    </div>
-                    <div className='featureBoxPrompt'>
-                        <span className='promptText'>[{prompt}]</span>
-                    </div>
-                    <div className='featureBox'>
-                        <span className='timeScoreText'>SCORE</span>
-                        <span className='timeText'>{gameScore}</span>
-                    </div>
+                    {isGameOver ? (
+                            <div className='couldHave'>
+                                <span className='timeScoreText'>You could have answered "{couldAnswer}"</span>
+                                <span className='timeTextItalic'>"{couldAnswerDef}"</span>
+                            </div>
+                        ) : (
+                            <>
+                                <div className='featureBox'>
+                                    <span className='timeScoreText'>TIME</span>
+                                    <span className='timeScoreText'>{gameTime}</span>
+                                </div>
+                                <div className='featureBoxPrompt'>
+                                    <span className='promptText'>[{prompt}]</span>
+                                </div>
+                                <div className='featureBox'>
+                                    <span className='timeScoreText'>SCORE</span>
+                                    <span className='timeScoreText'>{gameScore}</span>
+                                </div>
+                            </>
+                        )}
                 </div>
                 <div className='inputContainer'>
-                    <input disabled={isGameOver} className='answerInput' onChange={setVals} value={answer} />
+                    <p style={{position: 'relative', top: '5px'}}>'Enter' to Submit</p>
+                    <input disabled={isGameOver} autoComplete="off" className='answerInput' onChange={setVals} value={answer} />   
+                        {loadingValidation ? (
+                                        <div className='inputError'>
+                                            <ClipLoader size={20} style={{position: 'absolute', right: '10px'}}/>
+                                        </div>
+                                    ) : (null)}
                     {inputError && (
-                        <>
-                            <div className='inputError'>
+                            <div className={ inputErrorMessage === '+1' ? 'inputErrorSuccess' : 'inputError' }>
                                 <span className='inputErrorText'>{inputErrorMessage}</span>
                             </div>
-                            {inputErrorMessage === 'Game Over!' && (
+                    )}
+                    {inputErrorMessage === 'Game Over!' && (
                                 <div className='playOrSave'>
-                                    <span onClick={resetGame} className='timeText'>Play Again</span>
-                                    <span style={{ fontSize: '2em' }}> or </span>
-                                    <span onClick={() => setShowScoreModal(true)}className='timeText'>Save</span>
+                                    <button disabled={showScoreModal} onClick={resetGame} className='startButton'>Play Again</button>
+                                    <button disabled={showScoreModal} onClick={() => setShowScoreModal(true)}className='startButton'>Save</button>
+                                    <button disabled={showScoreModal} onClick={() => props.setShowing('rules')}className='startButton'>Rules</button>
                                 </div>
                             )}
-                        </>
-                    )}
                     {showScoreModal && (
                         <div className='enterScoreModal'>
                             <span className='timeText'>You scored {gameScore}</span>
-                            <span className='timeText'>You could have answered "{couldAnswer}"</span>
-                            <span className='timeTextItalic'>"{couldAnswerDef}"</span>
                             <span className='timeText'>Enter a name to save your score</span>
                             <input
                                 onChange={(e) => {
@@ -228,8 +270,16 @@ function GameScreen(props) {
                                 className='nameInput'
                                 value={username}
                             />
-                            {usernameError && <div className='inputError'>{usernameError}</div>}
-                            <span onClick={saveAndSubmit} style={{ fontSize: '2em', textDecoration: 'underline' }}>Save</span>
+                            {usernameError && <div className='saveInputError'>{usernameError}</div>}
+                            {saveLoading ? (
+                                        <div className='inputError'>
+                                            <ClipLoader size={20} style={{position: 'absolute', top: '20px', right: '10px'}}/>
+                                        </div>
+                                    ) : (null)}
+                            <div>
+                                <button onClick={saveAndSubmit} className='startButton'>Save</button>
+                                <button onClick={() => setShowScoreModal(false)} className='startButton'>Cancel</button>
+                            </div>
                         </div>
                     )}
                 </div>

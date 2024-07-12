@@ -4,8 +4,8 @@ import './App.css';
 function RulesScreen(props) {
   return (
     <div className="container">
-      <span className='topper'>WHWG</span>
       <div className='rulesBlock'>
+      <span className='topper'>Speedle</span>
         <div style={{paddingBottom: '5%'}}>
           <text className='rulesText'>Welcome to the World's Hardest Word Game</text>
         </div>
@@ -26,8 +26,8 @@ function RulesScreen(props) {
         </div>
         <button className='startButton' onClick={() => props.setShowing('game')}>Begin</button>
         <button className='startButton' onClick={() => props.setShowing('scoreboard')}>Scoreboard</button>
+        <text className='plug'>Support the creator! Email me at araujota97@gmail.com</text>
       </div>
-      <text style={{justifySelf: 'center'}}>Support the creator! Email me at araujota97@gmail.com or venmo me @Tyler-Araujo</text>
     </div>
   );
 }
