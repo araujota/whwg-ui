@@ -21,10 +21,16 @@ function GameScreen(props) {
     const [couldAnswer, setCouldAnswer] = useState('')
     const [couldAnswerDef, setCouldAnswerDef] = useState('')
     const [saveLoading, setSaveLoading] = useState(false);
+    const [skipCount, setSkipCount] = useState(3);
 
     const answerr = useRef(answer);
     const promptt = useRef(prompt);
     const promptPoool = useRef(promptPool);
+    const inputRef = useRef(null);
+
+    useEffect(() => {
+        inputRef.current.focus();
+    }, [gameTime])
 
     const loadPrompt = () => {
         const isAlpha = (str) => /^[A-Za-z]+$/.test(str);
@@ -44,8 +50,10 @@ function GameScreen(props) {
     };
 
     const resetGame = () => {
+        setAnswer('');
         setGameTime(20);
         setGameScore(0);
+        setSkipCount(3);
         setInputError(false);
         setInputErrorMessage('');
         loadPrompt();
@@ -56,11 +64,16 @@ function GameScreen(props) {
         new Audio(Chime_01).play()
       };
 
+    const skipPropmt = () => {
+        setSkipCount(skipCount -1)
+        loadPrompt()
+        setGameTime(20);
+    }
+
     const answerSuccess = () => {
         setGameScore((prevScore) => prevScore + 1);
         setInputError(true);
         setInputErrorMessage('+1');
-        setTimeout(clearInputMsg, 1500)
         setAnswer('');
         setGameTime(20);
         loadPrompt();
@@ -94,20 +107,15 @@ function GameScreen(props) {
     };
 
     const gameOver = () => {
+        inputRef.current.blur();
         setIsGameOver(true);
-        setInputError(true);
-        setInputErrorMessage("Game Over!");
+        setInputError(false);
+        setInputErrorMessage('');
+        setAnswer(`Your Score : ${gameScore}`)
     };
 
     const decrement = () => {
         setGameTime((prevTime) => prevTime - 1);
-    };
-
-    const clearInputMsg = () => {
-        if (inputErrorMessage !== "Game Over") {
-            setInputErrorMessage('')
-            setInputError(false)
-        }
     };
 
     useEffect(() => {
@@ -173,19 +181,19 @@ function GameScreen(props) {
         if (status === 404) {
             setInputErrorMessage('Not a Word!');
             setLoadingValidaton(false);
-            setTimeout(clearInputMsg, 1500)
+            
         } else if (start === promptt.current) {
             setInputErrorMessage('Answer cannot start with the prompt!');
             setLoadingValidaton(false);
-            setTimeout(clearInputMsg, 1500)
+            
         } else if (end === promptt.current) {
             setInputErrorMessage('Answer cannot end with the prompt!');
             setLoadingValidaton(false);
-            setTimeout(clearInputMsg, 1500)
+            
         } else if (!answerr.current.includes(promptt.current)) {
             setInputErrorMessage('Answer must contain the prompt!');
             setLoadingValidaton(false);
-            setTimeout(clearInputMsg, 1500)
+            
         }
         setInputError(true);
         setAnswer('');
@@ -220,7 +228,9 @@ function GameScreen(props) {
                     {isGameOver ? (
                             <div className='couldHave'>
                                 <span className='timeScoreText'>You could have answered "{couldAnswer}"</span>
-                                <span className='timeTextItalic'>"{couldAnswerDef}"</span>
+                                {couldAnswerDef.length && 
+                                    <span className='timeTextItalic'>"{couldAnswerDef}"</span>
+                                }       
                             </div>
                         ) : (
                             <>
@@ -239,19 +249,28 @@ function GameScreen(props) {
                         )}
                 </div>
                 <div className='inputContainer'>
-                    <p style={{position: 'relative', top: '5px'}}>'Enter' to Submit</p>
-                    <input disabled={isGameOver} autoComplete="off" className='answerInput' onChange={setVals} value={answer} />   
+                    {!isGameOver &&
+                        <p style={{position: 'relative', top: '5px'}}>'Enter' to Submit</p>
+                    }
+                    <input ref={inputRef} disabled={isGameOver} autoComplete="off" className='answerInput' onChange={setVals} value={answer} />   
                         {loadingValidation ? (
                                         <div className='inputError'>
                                             <ClipLoader size={20} style={{position: 'absolute', right: '10px'}}/>
                                         </div>
                                     ) : (null)}
-                    {inputError && (
+                    {inputError && !loadingValidation && (
                             <div className={ inputErrorMessage === '+1' ? 'inputErrorSuccess' : 'inputError' }>
                                 <span className='inputErrorText'>{inputErrorMessage}</span>
                             </div>
                     )}
-                    {inputErrorMessage === 'Game Over!' && (
+                    {!isGameOver && 
+                        <div style={{marginTop: '30px'}}>
+                            <button disabled={!skipCount > 0} onClick={() => skipPropmt()} className='startButton'>Skip: {skipCount}</button>
+                        </div>    
+                    }
+                    
+                    
+                    {isGameOver && (
                                 <div className='playOrSave'>
                                     <button disabled={showScoreModal} onClick={resetGame} className='startButton'>Play Again</button>
                                     {/* <button disabled={showScoreModal} onClick={() => setShowScoreModal(true)}className='startButton'>Save</button> */}

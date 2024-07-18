@@ -10,10 +10,10 @@ function RulesScreen(props) {
           <text className='rulesText'>Welcome to the World's Hardest Word Game</text>
         </div>
         <div style={{paddingBottom: '5%'}}>
-          <text className='rulesText'>You will receive 3-letter prompts picked from a random word in the dictionary</text>
+          <text className='rulesText'>You will see 3 letters in a row picked from a random word in the dictionary</text>
         </div>
         <div style={{paddingBottom: '5%'}}>
-          <text className='rulesText'>You will have 20 seconds to type a word that contains the prompt</text>
+          <text className='rulesText'>Enter a word that contains those letters</text>
         </div>
         <div style={{paddingBottom: '5%'}}>
           <text className='rulesText'>But NOT at the very beginning or very end</text>
