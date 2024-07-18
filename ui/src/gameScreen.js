@@ -254,7 +254,7 @@ function GameScreen(props) {
                     {inputErrorMessage === 'Game Over!' && (
                                 <div className='playOrSave'>
                                     <button disabled={showScoreModal} onClick={resetGame} className='startButton'>Play Again</button>
-                                    <button disabled={showScoreModal} onClick={() => setShowScoreModal(true)}className='startButton'>Save</button>
+                                    {/* <button disabled={showScoreModal} onClick={() => setShowScoreModal(true)}className='startButton'>Save</button> */}
                                     <button disabled={showScoreModal} onClick={() => props.setShowing('rules')}className='startButton'>Rules</button>
                                 </div>
                             )}

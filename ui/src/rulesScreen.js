@@ -25,7 +25,7 @@ function RulesScreen(props) {
           <text className='rulesText'><span style={{color: 'red'}}>ice</span>berg tr<span style={{color: 'green'}}>ice</span>p pract<span span style={{color: 'red'}}>ice</span></text>
         </div>
         <button className='startButton' onClick={() => props.setShowing('game')}>Begin</button>
-        <button className='startButton' onClick={() => props.setShowing('scoreboard')}>Scoreboard</button>
+        {/* <button className='startButton' onClick={() => props.setShowing('scoreboard')}>Scoreboard</button> */}
         <text className='plug'>Support the creator! Email me at araujota97@gmail.com</text>
       </div>
     </div>
