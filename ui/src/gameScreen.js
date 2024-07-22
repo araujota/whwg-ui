@@ -165,7 +165,7 @@ function GameScreen(props) {
         const end = answerr.current.slice(-3);
 
         try {
-            const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${answerr.current}`);
+            const response = await fetch(`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${answerr.current}?key=7db26f3a-a877-4b4d-8f05-91a5ebe4c4ae`);
             if (response.status === 200 && start !== promptt.current && end !== promptt.current && answerr.current.includes(promptt.current)) {
                 playAudio()
                 answerSuccess();
