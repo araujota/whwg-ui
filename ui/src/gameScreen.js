@@ -166,9 +166,17 @@ function GameScreen(props) {
 
         try {
             const response = await fetch(`https://www.dictionaryapi.com/api/v3/references/collegiate/json/${answerr.current}?key=7db26f3a-a877-4b4d-8f05-91a5ebe4c4ae`);
-            if (response.status === 200 && start !== promptt.current && end !== promptt.current && answerr.current.includes(promptt.current)) {
-                playAudio()
-                answerSuccess();
+            if (response.status === 200) {
+                let data = await response.json();
+                console.log(data)
+                
+                // Check if the response data contains valid word entries
+                    if (data.length < 2 && start !== promptt.current && end !== promptt.current && answerr.current.includes(promptt.current)) {
+                        playAudio();
+                        answerSuccess();
+                    } else {
+                        handleValidationError('invalid', start, end);
+                    }
             } else {
                 handleValidationError(response.status, start, end);
             }
@@ -178,7 +186,7 @@ function GameScreen(props) {
     };
 
     const handleValidationError = (status, start, end) => {
-        if (status === 404) {
+        if (status === 'invalid') {
             setInputErrorMessage('Not a Word!');
             setLoadingValidaton(false);
             
