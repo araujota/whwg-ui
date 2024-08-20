@@ -171,7 +171,7 @@ function GameScreen(props) {
                 console.log(data)
                 
                 // Check if the response data contains valid word entries
-                    if (data.length < 2 && start !== promptt.current && end !== promptt.current && answerr.current.includes(promptt.current)) {
+                    if (data[0].meta && start !== promptt.current && end !== promptt.current && answerr.current.includes(promptt.current)) {
                         playAudio();
                         answerSuccess();
                     } else {
