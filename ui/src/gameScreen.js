@@ -171,11 +171,11 @@ function GameScreen(props) {
                 console.log(data)
                 
                 // Check if the response data contains valid word entries
-                    if (data[0].meta && start !== promptt.current && end !== promptt.current && answerr.current.includes(promptt.current)) {
+                    if (data[0]?.meta && start !== promptt.current && end !== promptt.current && answerr.current.includes(promptt.current)) {
                         playAudio();
                         answerSuccess();
                     } else {
-                        handleValidationError('invalid', start, end);
+                        handleValidationError(start, end);
                     }
             } else {
                 handleValidationError(response.status, start, end);
@@ -185,12 +185,8 @@ function GameScreen(props) {
         }
     };
 
-    const handleValidationError = (status, start, end) => {
-        if (status === 'invalid') {
-            setInputErrorMessage('Not a Word!');
-            setLoadingValidaton(false);
-            
-        } else if (start === promptt.current) {
+    const handleValidationError = (start, end) => {
+        if (start === promptt.current) {
             setInputErrorMessage('Answer cannot start with the prompt!');
             setLoadingValidaton(false);
             
@@ -202,6 +198,9 @@ function GameScreen(props) {
             setInputErrorMessage('Answer must contain the prompt!');
             setLoadingValidaton(false);
             
+        } else {
+            setInputErrorMessage('Not A Word!');
+            setLoadingValidaton(false)
         }
         setInputError(true);
         setAnswer('');
